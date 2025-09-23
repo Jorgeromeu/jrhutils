@@ -4,12 +4,30 @@ version = "0.1.0"
 description = "My personal utility functions library"
 readme = "README.md"
 requires-python = ">=3.8"
+
 dependencies = [
-    "einops>=0.6.0",
-    "matplotlib>=3.3.0",
-    "numpy>=1.19.0",
-    "pillow>=8.0.0",
+  "einops>=0.6.0",
+
+  # numpy: 1.24+ dropped 3.8
+  "numpy>=1.19.0,<1.24.0; python_version < '3.9'",
+  "numpy>=1.23.1; python_version >= '3.9'",
+
+  # pillow: 10.0 dropped 3.8
+  "pillow>=8.0.0,<10.0.0; python_version < '3.9'",
+  "pillow>=10.0.0; python_version >= '3.9'",
+
+  # matplotlib: keep 3.8+ for 3.9+, cap for 3.8
+  "matplotlib>=3.3.0,<3.8; python_version < '3.9'",
+  "matplotlib>=3.8.0; python_version >= '3.9'",
+
+  # moviepy: 2.x requires >=3.9
+  "moviepy<2.0; python_version < '3.9'",
+  "moviepy>=2.2.1; python_version >= '3.9'",
+
+  # typing backports for <3.11 if you use modern typing features
+  "typing-extensions>=4.7; python_version < '3.11'",
 ]
+
 
 [project.optional-dependencies]
 torch = ["torch>=1.13.0"]
