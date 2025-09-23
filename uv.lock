@@ -505,8 +505,8 @@ torch = [
 requires-dist = [
     { name = "einops", specifier = ">=0.6.0" },
     { name = "matplotlib", specifier = ">=3.3.0" },
-    { name = "numpy", specifier = ">=1.19.0,<1.24.0" },
-    { name = "pillow", specifier = ">=8.0.0,<10.0.0" },
+    { name = "numpy", specifier = ">=1.19.0" },
+    { name = "pillow", specifier = ">=8.0.0" },
     { name = "torch", marker = "extra == 'torch'", specifier = ">=1.13.0" },
 ]
 provides-extras = ["torch"]
