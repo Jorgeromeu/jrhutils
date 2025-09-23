@@ -1,0 +1,18 @@
+[project]
+name = "jrhutils"
+version = "0.1.0"
+description = "My personal utility functions library"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "einops>=0.8.1",
+    "ipykernel>=6.30.1",
+    "matplotlib>=3.9.4",
+    "moviepy>=2.2.1",
+    "numpy>=2.0.2",
+    "pillow>=10.0.0",
+]
+
+[project.optional-dependencies]
+torch = ["torch>=1.13.0"]
+
