@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from PIL import Image
 
 
+
 def display_ims_grid(
     images: List[List[Image.Image]],
     scale=2.5,
@@ -13,8 +14,17 @@ def display_ims_grid(
     show=True,
     vmin=None,
     vmax=None,
+    cmap='gray',
+    interpolation='nearest',
 ):
     images = images.copy()
+
+    imshow_kwargs = {
+        "cmap": cmap,
+        "interpolation": interpolation,
+        "vmin": vmin,
+        "vmax": vmax,
+    }
 
     # shape
     n_rows = len(images)
@@ -34,7 +44,7 @@ def display_ims_grid(
     for row_i in range(n_rows):
         for col_i in range(n_cols):
             ax = axs[row_i, col_i]
-            ax.imshow(images[row_i][col_i], vmin=vmin, vmax=vmax)
+            ax.imshow(images[row_i][col_i], **imshow_kwargs)
             ax.set_xticks([])
             ax.set_yticks([])
             ax.set_frame_on(False)
@@ -64,6 +74,8 @@ def display_ims(
     show=True,
     vmin=None,
     vmax=None,
+    interpolation='nearest',
+    cmap='gray',
 ):
     result = display_ims_grid(
         [images],
@@ -74,6 +86,8 @@ def display_ims(
         show=show,
         vmin=vmin,
         vmax=vmax,
+        cmap=cmap,
+        interpolation=interpolation,
     )
 
     if not show:
