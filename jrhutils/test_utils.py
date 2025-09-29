@@ -87,7 +87,6 @@ def checkerboard_img(
 
     size = (resolution, resolution)
     square_size = round(resolution / num_squares)
-    print(square_size)
 
     width, height = size
     img = Image.new("RGB", size)
