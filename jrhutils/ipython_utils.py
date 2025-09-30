@@ -16,6 +16,7 @@ def display_ims_grid(
     vmax=None,
     cmap='gray',
     interpolation='nearest',
+    imshow_kwargs=None,
 ):
     images = images.copy()
 
@@ -24,6 +25,7 @@ def display_ims_grid(
         "interpolation": interpolation,
         "vmin": vmin,
         "vmax": vmax,
+        **(imshow_kwargs or {}),
     }
 
     # shape
@@ -76,6 +78,7 @@ def display_ims(
     vmax=None,
     interpolation='nearest',
     cmap='gray',
+    imshow_kwargs=None,
 ):
     result = display_ims_grid(
         [images],
@@ -88,6 +91,7 @@ def display_ims(
         vmax=vmax,
         cmap=cmap,
         interpolation=interpolation,
+        imshow_kwargs=imshow_kwargs,
     )
 
     if not show:
