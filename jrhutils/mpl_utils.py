@@ -1,11 +1,14 @@
 from typing import List
 
+import copy
+from matplotlib.collections import PathCollection
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.patches import Rectangle
 from matplotlib.transforms import Bbox
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+from matplotlib import patches
 
 
 def make_gridspec_figure(
@@ -72,29 +75,62 @@ def add_pixel_marker(
     rect = Rectangle(coord_pix, height=pixel_w, width=pixel_w, color=color)
     return ax.add_patch(rect)
 
+def copy_data(ax_src: Axes, ax_tgt: Axes):
+    """
+    Copy data from one axes to another
+    :param ax_src: source axes
+    :param ax_tgt: target axes
+    """
+    # copy lines data
+    for line in ax_src.get_lines():
+        ax_tgt.plot(
+            *line.get_data(),
+            color=line.get_color(),
+            linestyle=line.get_linestyle(),
+            linewidth=line.get_linewidth(),
+            alpha=line.get_alpha(),
+        )
+
+    # copy images data
+    for im in ax_src.images:
+        ax_tgt.imshow(
+            im.get_array(),
+            extent=im.get_extent(),
+            cmap=im.get_cmap(),
+            norm=im.norm,
+            interpolation=im.get_interpolation(),
+        )
+    
+    for collection in ax_src.collections:
+        if isinstance(collection, PathCollection):
+            offsets = collection.get_offsets()
+            ax_tgt.scatter(
+                offsets[:, 0], offsets[:, 1],
+                s=collection.get_sizes(),
+                facecolors=collection.get_facecolors(),
+                edgecolors=collection.get_edgecolors(),
+                linewidths=collection.get_linewidths(),
+                alpha=collection.get_alpha(),
+            )
+        else:
+            ax_tgt.add_collection(copy.copy(collection))
 
 def add_zoom_inset(ax: Axes, box: Bbox, width="40%", loc="lower right", color="red"):
-    # make inset
-    axins = inset_axes(ax, width=width, height=width, loc=loc)
+    # make inset axes
+    axins = inset_axes(
+        ax,
+        width=width,
+        height=width,
+        loc=loc,
+    )
     axins.set_xticks([])
     axins.set_yticks([])
 
-    # Recover image data, and add to new axes
-    img = ax.images[0]
-    data = img.get_array()
-    extent = img.get_extent()
-    cmap = img.get_cmap()
-    norm = img.norm
-    axins.imshow(
-        data,
-        extent=extent,
-        cmap=cmap,
-        norm=norm,
-    )
+    copy_data(ax, axins)
 
-    # zoom
+    # zoom in
     axins.set_xlim(box.x0, box.x1)
-    axins.set_ylim(box.y1, box.y0)
+    axins.set_ylim(box.y0, box.y1)
 
     for spine in axins.spines.values():
         spine.set_edgecolor(color)
@@ -110,13 +146,43 @@ def add_zoom_inset(ax: Axes, box: Bbox, width="40%", loc="lower right", color="r
     )
     ax.add_patch(rect)
 
+def make_zoom_inset(src_ax: Axes, tgt_ax: Axes, box: Bbox, color="red"):
+    # Recover image data, and add to new axes
+    img = src_ax.images[0]
+    data = img.get_array()
+    extent = img.get_extent()
+    cmap = img.get_cmap()
+    norm = img.norm
+    tgt_ax.imshow(
+        data,
+        extent=extent,
+        cmap=cmap,
+        norm=norm,
+    )
+
+    # zoom
+    tgt_ax.set_xlim(box.x0, box.x1)
+    tgt_ax.set_ylim(box.y1, box.y0)
+
+    for spine in tgt_ax.spines.values():
+        spine.set_edgecolor(color)
+        spine.set_linewidth(1)
+
+    rect = Rectangle(
+        (box.x0, box.y0),
+        box.width,
+        box.height,
+        edgecolor=color,
+        facecolor="none",
+        linewidth=1,
+    )
+    src_ax.add_patch(rect)
 
 def add_inset(ax: Axes, width="40%", loc="lower right"):
     axins = inset_axes(ax, width=width, height=width, loc=loc)
     axins.set_xticks([])
     axins.set_yticks([])
     return axins
-
 
 def bbox_around_point(point: np.ndarray, width: int = 10) -> Bbox:
     """
@@ -130,3 +196,18 @@ def bbox_around_point(point: np.ndarray, width: int = 10) -> Bbox:
     y1 = point[1] + width / 2
 
     return Bbox.from_extents(x0, y0, x1, y1)
+
+def rectangle_from_bbox(bbox, edgecolor="red", facecolor="none", linewidth=2, **kwargs):
+    """Create a Rectangle patch from a Bbox."""
+    x0, y0 = bbox.x0, bbox.y0
+    width = bbox.width
+    height = bbox.height
+    return patches.Rectangle(
+        (x0, y0),
+        width,
+        height,
+        edgecolor=edgecolor,
+        facecolor=facecolor,
+        linewidth=linewidth,
+        **kwargs,
+    )

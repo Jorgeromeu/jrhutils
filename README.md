@@ -9,5 +9,5 @@ pip install git+https://github.com/Jorgeromeu/jrhutils
 ```
 
 ```python
-uv add git+https://github.com/Jorgeromeu/jrhutils
+uv add --dev git+https://github.com/Jorgeromeu/jrhutils
 ```
